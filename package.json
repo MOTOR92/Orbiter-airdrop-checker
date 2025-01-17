@@ -5,8 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:forever": "forever start -o out.log -e err.log src/index.js",
-    "start": "node src/index.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",

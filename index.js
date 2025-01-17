@@ -1,13 +1,26 @@
+import fs from "fs";
 import { ethers } from "ethers";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import fetch from "node-fetch";
 
-import { randInt, txtToArray, sleep } from './utils/helpers.js';
-import { logger } from './logging/logger.js';
-import 'dotenv/config';
+
+const RUN_ASYNC = true;  // true / false, если включено - не будет никаких задержек, сразу прохуярит все
+const DELAY_RANGE_SEC = [1, 3];  // задержки между аккаунтами, если отключено асинхронное выполнение
 
 
-const DELAY_RANGE_SEC = [1, 3];
+const sleep = (sec) => {
+	return new Promise(resolve => setTimeout(resolve, sec * 1000));
+};
+
+
+const randInt = (min, max) => {
+	return Math.floor(Math.random() * (max - min + 1) + min);
+};
+
+
+const txtToArray = (filePath) => {
+    return fs.readFileSync(filePath, 'utf8').toString().replace(/\r\n/g, '\n').split('\n').filter(n => n);
+};
 
 
 async function signMessage(wallet, message) {
@@ -40,29 +53,33 @@ const checkOrbiterDrop = async (wallet, proxy=null) => {
 };
 
 
+const processWallet = async (privateKey, proxy) => {
+    try {
+        const wallet = new ethers.Wallet(privateKey);
+        const allocation = await checkOrbiterDrop(wallet, proxy);
+        console.log(`${wallet.address}: ${allocation}`);
+    } catch (error) {
+        console.log(`${wallet.address} - check failed: ${error}`);
+    }
+};
+
+
 const start = async () => {
     const privateKeys = txtToArray('./privateKeys.txt');
     const proxies = txtToArray('./proxies.txt');
     
     let i = 0;
     for (const privateKey of privateKeys) {
-        try {
-            const wallet = new ethers.Wallet(privateKey);
-            const allocation = await checkOrbiterDrop(wallet, proxies[i]);
-            logger.info(`${i+1} - ${wallet.address}: ${allocation}`);
-        } catch (error) {
-            logger.error(`${i+1} - check failed: ${error}`);
-        } finally {
-            i++;
+        if (RUN_ASYNC) {
+            processWallet(privateKey, proxies[i]);
+        } else {
+            await processWallet(privateKey, proxies[i]);
             const delaySec = randInt(...DELAY_RANGE_SEC);
             await sleep(delaySec);
         }
+    
+        i++;
     }
-};
-
+}
 
 start();
-
-
-
-
