@@ -1,0 +1,22 @@
+{
+  "type": "module",
+  "name": "orbiter-airdrop-checker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:forever": "forever start -o out.log -e err.log src/index.js",
+    "start": "node src/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.1",
+    "ethers": "^6.10.0",
+    "forever": "^4.0.3",
+    "header-generator": "^2.1.61",
+    "https-proxy-agent": "^7.0.2",
+    "node-fetch": "^3.3.2",
+    "winston": "^3.11.0"
+  }
+}
