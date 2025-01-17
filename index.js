@@ -43,7 +43,7 @@ const checkOrbiterDrop = async (wallet, proxy=null) => {
 
     if (![200, 201].includes(response.status)) {
         throw new Error(
-            `Unexpected html fetch listings code: ${response.status}, response: ${await response.text()}`
+            `Unexpected response code: ${response.status}, response: ${await response.text()}`
         );
     }
 
